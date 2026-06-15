@@ -1,0 +1,124 @@
+\documentclass[a4paper]{article}
+\usepackage[margin=1in]{geometry} % 设置边距，符合Word设定
+\usepackage{ctex}
+\usepackage{lipsum}
+\usepackage{calc}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{tcolorbox}
+\pagestyle{empty}
+\pagenumbering{gobble} %此行可以取消页码
+
+\title{\heiti\zihao{2} 机器人学习}
+\author{\songti coco}
+\date{4/3/2026}
+\begin{document}
+    \maketitle
+\section{机器人}
+
+% \newcommand{\tnss}{The not so Short Introduction to \LaTeXe}
+
+% This is ``\tnss'' \ldots{} ``\tnss''.
+
+% \newcommand{\note}{\noindent\textbf{注：}}
+% \note{This is a text!}
+
+% \newcommand{\degree}[1]{#1$^\circ$}
+% \degree{30}
+
+\newcommand{\textred}[1]{\textcolor{red}{#1}\par}
+%\textred{这一行字体会变成红色。}
+
+% \newenvironment{redenv}{
+%     \color{red}
+% }{
+%     \par
+% }
+% % 红色字体环境
+
+% \begin{redenv}
+% 这是一段红色的字体。
+% \end{redenv}
+
+机器人操作系统（Robot Operating System，ROS）是一个灵活的软件
+框架，为机器人软件开发提供了丰富的工具和软件库，可以帮助人们提高开
+发机器人的效率。
+
+选择ROS的一些主要原因（高端功能）：ROS自带现成的算法。
+
+比如，即时定位与地图构建
+（Simultaneous Loc-ali-zation and Mapping，SLAM）和自适应蒙特卡罗定
+位（Adaptive Monte Carlo Localiza-tion，AMCL），这两个软件包可用于
+移动机器人的自主导航。
+
+ROS的消息传递机制允许在不同节点间进行通信。我们可以用
+C++或C语言对节点进行编程，当然也可以用Python或Java语言。
+
+\textred{ROS技术社区（http://answers.ros.org）}
+
+ROS的主要仿真平台是Gazebo，Gazebo仿真器没有内置的编程
+环境，所有仿真必须在ROS下编程完成。与Gazebo比较，其他仿真环境（如
+V-REP、Webots）有内置的编程环境，可以直接对机器人进行原型设计与编
+程。而且，这些仿真环境有丰富的图形界面（GUI）工具集，支持各类机器
+人，并且提供了ROS接口。虽然这些相应的工具都是各自平台专用的，但效
+果也都不错。
+ROS中主要有三个级别：文件系统、计算图、社区。
+
+为了能创建、修改、使用ROS软件包，我们需要先了解一些常用命令。
+下面是一些使用ROS软件包的常用命令
+catkin\_create\_pkg 此命令用于创建一个新软件包。
+rospack 此命令用于获取软件包相关的信息。
+catkin\_make 此命令用于在工作区中编译软件包。
+rosdep 此命令将安装一个软件包所需的系统依赖项。
+
+ROS博客会定期更新与ROS社区相关的新闻、照片、视频
+（http://www.ros.org/news）
+
+\section{ROS编程入门}
+ROS软件包是ROS系统的基本单位。
+
+使用ROS软件包的第一个要求是创建ROS的catkin工作区。
+
+话题是两个节点间通信的基本方式。
+下面我们将创建两个ROS节点，一个发布话题，另一个订阅该话题。
+
+节点间的相互通讯通过/number完成。
+demo\_topic\_publisher节点向/numbers话题发布信息，然后
+demo\_topic\_subscriber节点订阅这个话题
+
+与ROS服务一样，在actionlib中，我们也必须初始化动作规范。这个动
+作的规范存储在以.action结尾的文件中。该文件必须保存在ROS软件包内的
+action文件夹中。action文件包含以下各部分内容。
+·Goal（目标）：动作客户端可以发送一个必须由动作服务器来执行的目标。
+这就类似于ROS服务中的请求。例如，如果机器人手臂关节想从45度转动到
+90度，那么这里的目标就是90度。
+·Feedback（反馈）：动作客户端向动作服务器发送目标后，将开始执行回
+调函数。反馈只是简单地给出回调函数内当前操作的进度。通过使用反馈，
+我们可以获得当前任务的进度。在前面的例子中，机器人手臂关节必须移动
+到90度，在这种情况下，反馈就是机械臂从45度转动到90度之间的中间
+值。
+·Result（结果）：完成目标后，动作服务器将发送完成的最终结果，它可以
+是计算结果或者一个确认。在前面的例子中，如果关节转动到90度，则完成
+了目标任务，结果就是可以表示目标完成的任何形式。
+
+话题（topic）、服务（service）和动作库（actionlib）可应用于不同的
+场景。我们知道话题是单向通信的，服务是具备请求/应答功能的双向通
+信，动作库是ROS服务的一种变化形式，我们可以在需要时取消在服务器上
+运行的进程。
+
+\section{在ROS中为3D机器人建模}
+机器人制造的第一个阶段是设计和建模。这里我们可以使用CAD软件对一个机器人进行设
+计和建模，例如AutoCAD、SOLIDWORKS和Blender。机器人建模的主要目的之一就是仿
+真。
+
+将讨论两类机器人的设计。一个是七 自由度（7 Degrees of Freedom，7-
+DOF）机械手臂，另一个是差速驱动机器人。
+
+可以使用URDF来定义机器人模型、传感器和工作环境，使用URDF
+解析器对其进行解析。
+
+设计好URDF后，可以在RViz上查看它。我们可以创建一个
+view\_demo.launch启动文件，并将下面的代码存放到该文件中，然后将该文
+件放入launch文件夹。
+
+\end{document}
