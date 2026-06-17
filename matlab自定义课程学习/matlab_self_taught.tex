@@ -1,0 +1,253 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}        % 中文支持
+\usepackage{geometry}
+\geometry{left=2.54cm,right=2.54cm,top=3.18cm,bottom=3.18cm}
+\usepackage{enumerate}        % 列表格式
+\usepackage{titlesec}         % 标题格式
+\usepackage{xcolor}           % 颜色包
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage{enumitem}
+\usepackage{enumerate}
+
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=red,    % 目录、图表、章节引用：黑色
+    citecolor=red,      % \cite{} 参考文献引用：红色（你需要的）
+    urlcolor=red     % 网址链接：黑色
+]{hyperref}
+
+\usepackage{listings}
+\lstset{
+    language=Matlab,          % 指定语言为Matlab
+    basicstyle=\ttfamily\small,% 代码基础字体
+    keywordstyle=\color{blue}, % function/end 关键字蓝色
+    commentstyle=\color{green!60!black}, % %注释绿色
+    stringstyle=\color{red},   % 字符串红色
+    numbers=left,              % 左侧行号（不需要写 numbers=none）
+    numberstyle=\tiny\color{gray},
+    frame=single,              % 外框单线
+    backgroundcolor=\color{gray!8}, % 浅灰背景
+    tabsize=4,                 % Tab缩进4空格
+    showstringspaces=false,    % 不显示空格下划线
+    breaklines=true,           % 长代码自动换行
+    escapeinside={/*@}{@*/},   % 代码内可插LaTeX命令
+}
+
+% 字体设置
+
+% ===================== 自定义功能区 =====================
+\newcommand{\textred}[1]{\textcolor{red}{#1}}           %红色字体
+\newcommand{\textgreen}[1]{\textcolor{green}{#1}}       %绿色字体
+\newcommand{\textblue}[1]{\textcolor{blue}{#1}}         %绿色字体
+\newcommand{\textyellow}[1]{\textcolor{yellow}{#1}}     %黄色字体
+% \newcommand{\wordnote}[2]{#1\,\raisebox{0.25ex}{\scriptsize #2}}
+\newcommand{\upmean}[1]{\raisebox{0.25ex}{\scriptsize #1}} %标注
+
+
+
+
+
+%========================== 正文 ============================
+
+
+\begin{document}
+
+\section{计算机视觉中的图像特征}
+\subsection{填写函数的方式和原因}
+
+\textbf{定义函数}
+
+函数定义由三个部分组成。
+
+1. 函数声明以关键字 function 开头，定义调用函数的语法。
+
+2. 函数体包含使用输入计算函数输出的命令。输出必须在函数体中定义。
+
+3. end 关键字是函数的最后一行。
+
+\begin{lstlisting}
+function out = myFunction(input)
+% code that calculates out
+end
+\end{lstlisting}
+
+
+\textbf{调用优先级}
+
+在 MATLAB 中，设置了规则以解释任何命名项。这些规则称为函数优先顺序。
+可以使用以下顺序解决最常见的引用冲突：
+
+变量
+
+当前脚本中定义的函数
+
+当前文件夹中的文件
+
+MATLAB 搜索路径上的文件
+
+
+\subsection{计算机视觉入门之旅}
+
+\href{https://matlabacademy.mathworks.com/cn/details/computer-vision-onramp/orcv}{计算机视觉入门之旅}
+
+课程简介：通过将典型工作流（检测跟踪）应用于海龟爬向大海的视频，
+学习计算机视觉的基础知识。您将了解特征在计算机视觉中的作用、如
+何标记数据、训练目标检测器以及在视频中跟踪野生动物。
+
+{\large 使用目标检测跟踪海龟}
+
+在本课程中，您将学习如何使用目标检测来跟踪视频中的目标。课程将从导入视频数据开始，
+逐步讲解此检测跟踪工作流。
+
+Import Video Data $\Rightarrow $ 
+Label Ground Truth Data $\Rightarrow $ 
+Train Detector$\Rightarrow $ 
+Detect Objects in Each Frame$\Rightarrow $ 
+Track Objects
+
+\subsubsection{创建视频读取器}
+
+可以使用 VideoReader 函数创建一个视频读取器，用于从文件中读取视频数据。
+
+\begin{lstlisting}
+v = VideoReader("myVid.mp4")
+\end{lstlisting}
+
+创建视频读取器后，您可以使用 readFrame 函数从视频文件中提取帧。
+
+\begin{lstlisting}
+v = VideoReader(filename)
+fr = readFrame(v);
+\end{lstlisting}
+
+readFrame 的输出是图像，它是由像素值组成的数组。您可以在 readFrame 
+函数结尾使用分号，以避免 MATLAB 显示数百万个数字。
+
+视频的一个帧就是一个图像。从视频文件中提取帧后，您可以像处理任何图像
+一样处理该帧。
+
+\begin{lstlisting}
+imshow(frame)
+%显示视频某一帧
+\end{lstlisting}
+
+在输出窗格的顶部，您可以看到 turtleVideo 的一些属性。例如，FrameRate 
+属性指示此视频的帧速率，即每秒显示的帧数
+
+您可以用圆点表示法提取这些属性。
+
+\begin{lstlisting}
+prop = obj.PropertyName
+\end{lstlisting}
+
+在上一个任务中，t 是 0.0333，即 $\frac{1}{frame~rate}$
+ 秒。在第 1 行上创建视频读取器时，CurrentTime 属性的值为 0。
+
+您可以使用 imshowpair 函数叠加两个图像，并以绿色和品红色显示它们的差异。
+
+\begin{lstlisting}
+imshowpair(im1,im2)
+\end{lstlisting}
+
+读取特定帧
+
+您可以反复调用 readFrame 以读取此视频的任一帧。但如何直接跳到第 90 帧呢？
+或如何回退到某个更早的帧？在本练习中，您将学习如何读取特定帧以及如何导航
+到视频中的任一帧。
+
+在输出窗格的顶部，您可以在 turtleVideo 的输出中看到视频的总帧数和持续时间。
+变量 tMid 大约在视频的一半位置。
+
+\begin{lstlisting}
+turtleVideo = 
+  VideoReader - 属性:
+
+   常规属性:
+            Name: 'turtles.avi'
+            Path: '/users/mwa0000035781096/.training/.work'
+        Duration: 3.3333
+     CurrentTime: 0
+       NumFrames: 100
+
+   视频属性:
+           Width: 400
+          Height: 600
+       FrameRate: 30
+    BitsPerPixel: 24
+     VideoFormat: 'RGB24'
+\end{lstlisting}
+
+\subsection{从参考图像中检测并提取特征}
+
+识别海龟的特征
+
+要进行目标检测，您需要具有待检测目标的参考图像。参考图像应仅包含对检测
+该目标有用的特征。在此任务中，您将通过在视频帧中裁剪海龟周围的区域，来
+创建一个海龟的参考图像。
+
+要指定要裁剪的矩形，需提供左上角的坐标以及矩形的宽度和高度（以像素为单
+位）。对于最小的 x 值和 y 值，您可以分别使用图像的列数和行数。
+
+您可以通过 imcrop 函数指定要保留的矩形来裁剪图像。
+imCropped = imcrop(im,rect);
+将矩形指定为一个四元素向量 [xmin ymin width height]。
+
+\begin{lstlisting}
+    rect = [xmin ymin width height];
+    imCropped = imcrop(im,rect);
+\end{lstlisting}
+
+您可以从矩阵或灰度图像中提取特征。由于 turtle 和 frame 是彩色图像，提取特征之前需将其转换为灰度图像。
+
+您可以使用 im2gray 函数基于彩色图像创建灰度图像。
+
+\begin{lstlisting}
+imGS = im2gray(im);
+\end{lstlisting}
+
+识别特征过程分为两部分：检测和提取。要检测图像中的类连通域特征，您可以使用 
+detectSIFTFeatures 函数。
+
+输出是一系列感兴趣点的列表，其中可能包含尺度不变特征变换 (SIFT) 特征。
+
+\begin{lstlisting}
+pts = detectSIFTFeatures(im)
+\end{lstlisting}
+
+现在您有了感兴趣点，可以使用它们来提取特征。感兴趣点标识了可查找特征的位置；
+一个点附近可能有多个特征，也可能一个特征也没有。
+
+您可以对任何类型的特征使用 extractFeatures 函数。
+
+第一个输出是特征矩阵。第二个输出是另一个 SIFTpoints 数组，其中包含这些特征的具体位置。
+
+\begin{lstlisting}
+[feat,ftPts] = extractFeatures(im,pts)
+\end{lstlisting}
+
+您可以通过绘图对提取的特征可视化。大多数特征对应于海龟图像的某个区域。
+SIFT 特征是一种连通域特征。其他特征类型对应使用相同语法的函数。
+使用的特征类型取决于图像中的特征以及使用方法。
+
+\begin{lstlisting}
+imshow(turtle)
+hold on
+plot(featurePoints)
+hold off
+\end{lstlisting}
+
+您已从参考图像和原始视频帧中提取了特征，现在可以使用 matchFeatures 
+函数来匹配这些特征。
+
+输出是一个包含匹配特征的索引的两列矩阵。indexedPairs 的第一列包含 
+feat1 的索引。第二列包含 feat2 的索引
+
+\begin{lstlisting}
+indexedPairs = matchFeatures(feat1,feat2)
+\end{lstlisting}
+
+
+
+\end{document}
