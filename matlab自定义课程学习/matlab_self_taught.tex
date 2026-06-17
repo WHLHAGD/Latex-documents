@@ -22,6 +22,7 @@
 \lstset{
     language=Matlab,          % 指定语言为Matlab
     basicstyle=\ttfamily\small,% 代码基础字体
+    upquote=true,              %强制使用无卷曲直引号
     keywordstyle=\color{blue}, % function/end 关键字蓝色
     commentstyle=\color{green!60!black}, % %注释绿色
     stringstyle=\color{red},   % 字符串红色
@@ -247,6 +248,414 @@ feat1 的索引。第二列包含 feat2 的索引
 \begin{lstlisting}
 indexedPairs = matchFeatures(feat1,feat2)
 \end{lstlisting}
+
+\subsection{创建训练图像}
+
+脚本中的 dir 命令返回当前文件夹中 .png 文件的列表。您可以在输出窗格
+中看到此时没有这样的文件。
+
+您可以使用 objectDetectorTrainingData 函数从视频文件创建训练图像。
+此函数将指定的每一帧写入一个图像文件，忽略不包含检测目标的帧。此语
+法使用 SamplingFactor 名称-值参量，每 n 帧提取一帧。
+
+第一个输出是创建的图像的列表。第二个输出包含这些图像的标签。
+
+\begin{lstlisting}
+[ims,labs] = objectDetectorTrainingData( ...
+     gTruth,SamplingFactor=n);
+\end{lstlisting}
+
+
+您可以通过在 objectDetectorTrainingData 函数中使用额外的名称-值参量
+来自定义图像文件的组织方式。例如，您可以标准化文件名或将图像写入特定文件夹。
+
+这里，创建的图像的名称以 basename 开头，并保存在 foldername 文件夹中。
+
+\begin{lstlisting}
+[ims,labs] = objectDetectorTrainingData( ...
+     gTruth,SamplingFactor=n, ...
+     NamePrefix="basename", ...
+     WriteLocation="foldername");
+\end{lstlisting}
+
+训练检测器时，您需要将图像列表和框标签合并为一个变量。您可以使用 combine 
+函数合并图像和标签。
+
+\begin{lstlisting}
+imsWithLabels = combine(ims,labs);
+\end{lstlisting}
+
+\subsection{训练ACF检测器}
+
+聚合通道特征 (ACF) 目标检测器使用图像的颜色通道和其他二维表示的特征来检测目标。
+
+您可以使用 trainACFObjectDetector 函数创建一个使用真实值图像训练的 ACF 检测器。
+
+\begin{lstlisting}
+d = trainACFObjectDetector(imsWithLabels)
+\end{lstlisting}
+
+您可以使用 detect 函数将 detector 应用于图像。
+[b,s] = detect(detector,im)
+第一个输出是一个由边界框组成的矩阵，边界框标识 im 中检测到的目标。第二个输出是
+一个由置信度分数组成的矩阵，置信度分数指示每次检测的强度。
+
+检测器发现了海龟，但也误将一块岩石标注为海龟。
+
+具有带注解的边界框的视频帧，这些边界框围绕四只海龟和一块岩石
+
+默认情况下，目标检测训练分为四个阶段。训练阶段越多，准确度越好，但需要的运行
+时间也越长。
+
+您可以在 trainACFObjectDetector 函数中使用 NumStages 名称-值参量来设置阶段数。
+
+\begin{lstlisting}
+detector = trainACFObjectDetector( ...
+     imsWithLabels, ...
+     NumStages=n)
+\end{lstlisting}
+
+\subsection{对检测目标进行后处理}
+
+图像中每个带注解的检测目标都标注有其分数。分数越高，表示检测到的目标是海龟的
+置信度越高。
+
+您可以通过设置分数阈值来删除低置信度的检测目标。用直方图可视化分数有助于确定
+阈值。
+
+histogram(score,10)
+
+根据直方图，您可以决定保留分数大于 50 的检测目标。但将阈值设置得太高也不合适，
+这会增加检测器对新帧的限制。我们先尝试保留分数大于 30 的检测目标。
+
+\subsection{对检测目标计数}
+
+现在，您可以将数值变量和用双引号引起来的文本串联起来创建一个字符串，以表示检
+测到的海龟数量。
+
+n = 50;
+
+s = "There are" + n + " states in the USA.";
+
+您将在下一个任务中使用此字符串来注解图像。
+
+您可以使用 insertText 函数通过文本来注解图像。
+
+imNew = insertText(im,[xmin ymin],textStr);
+
+第二个输入是一个由文本框左上角的 x 坐标和 y 坐标组成的向量。第三个输入是您要
+包含的字符串。
+
+\subsection{什么时候读取完所有帧？}
+
+在下一个练习中，您将学习如何处理视频的每帧。您如何知道何时停下来？例如，输出
+窗格显示当前时间是 0.9333。在本练习中，您将确定是否已读取所有帧。
+
+您尝试读取下一帧之前，可以使用 hasFrame 函数确定是否还有任何剩余帧。
+
+yn = hasFrame(v)
+
+输出是一个逻辑值，如果视频读取器中仍有待读取的帧，其值为 true；如果读取结束，
+则为 false。
+
+\subsection{对每帧应用检测算法}
+
+在本练习中，您将海龟检测算法应用于视频第一秒内的每一帧。
+
+在工作区中，detector 变量已基于更多数据进行了训练。此检测器比您之前创建的检测
+器更准确，但花费的训练时间更长。
+
+您可以使用 while 循环重复代码，直到满足某个条件。
+
+此处，condition 为 true 或 false，只要为 true，循环内的代码就会重复。在此任务
+中，您需要重复执行代码，直到已遍历所有帧（可通过 hasFrame 函数确定是否已遍历所
+有帧）。
+
+\begin{lstlisting}
+while condition
+    % code that does stuff
+end
+\end{lstlisting}
+
+\subsection{初始化卡尔曼滤波}
+在下一课中，您将使用卡尔曼滤波器跟踪此视频中的海龟。您通过跟踪能够知道海龟的位置，虽然它在故障期间检测不到。
+
+要设置卡尔曼滤波器，您需要对目标的运动做一些假设。您觉得它是均匀加速运动（就像下
+落的物体）还是匀速运动？视频中的海龟在剪辑期间似乎以相同的速度逐帧移动。
+
+您使用的运动模型会影响需要指定的关于运动和测量噪声的其他参数。您在前五个任务中定
+义参数，然后在任务 6 中使用它们初始化卡尔曼滤波器。
+
+初始化卡尔曼滤波器所需的第二个假设是初始位置，它是根据边界框计算的。
+
+initialLoc = centroid
+
+课程将测量噪声定义为方差。质心出现了约 10 个像素的位移。因此，您可以对测量噪声参
+数使用 
+
+$ 10^2 =100。$
+
+要初始化用于跟踪的卡尔曼滤波器，请使用 configureKalmanFilter 来指定您将跟踪的运动类型的假设。
+
+\begin{lstlisting}
+kalmanFilter = configureKalmanFilter(MotionModel,...
+     InitialLocation,...
+     InitialEstimateError,...
+     MotionNoise,...
+     MeasurementNoise)
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
