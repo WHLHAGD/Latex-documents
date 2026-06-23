@@ -8,7 +8,16 @@
 \usepackage{indentfirst}
 \setlength{\parindent}{2em}
 \usepackage{enumitem}
-\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+% \usepackage{hyperref}
+\usepackage[
+    colorlinks=true,
+    linkcolor=red,    % 目录、图表、章节引用：黑色
+    citecolor=red,      % \cite{} 参考文献引用：红色（你需要的）
+    urlcolor=magenta     % 网址链接：黑色
+]{hyperref}
 
 % 字体设置
 
@@ -110,291 +119,6 @@
 
 医学模型把心理障碍归为一种“疾病”，而心理学将其视为生物学、行为、认知、
 发展和社会文化因素相互作用的结果。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 % 书籍《我心态超好》
@@ -768,6 +492,86 @@ https://education.github.com/git-cheat-sheet
 Shoot for the moon. Even if you miss, you'll land among the stars.
 
 瞄准月亮吧。即使你没射中，也会落在星辰之间。
+
+
+
+
+
+
+\newpage
+
+\begin{table}
+    \resizebox{\linewidth}{!}{
+    \begin{tabular}{c c}        
+        \toprule
+        \textbf{git指令} & \textbf{功能说明}    \\
+        \midrule
+        git init         &  本地初始化           \\
+        git clone URL  &  将GitHub项目拉取到本地  \\
+        git add -A/--all &  根目录所有变更移到STAGE    \\
+        git add .        &  当前目录所有变更移到STAGE  \\    
+        git rm -r myFolder  &  删除某一个文件夹  \\
+        git commit -m "description"  &  提交，附带修改说明  \\
+        git log  &  查看提交记录（view commits）  \\
+        git log --oneline  &  查看提交记录(简洁版)（view commits）  \\
+        git push origin main  &  将commit过的文件上传到远程仓库"main"  \\
+        git fetch  &  从远程仓库获取最新版本  \\
+        git pull   &  从远程仓库获取最新版本并于本地仓库合并（pull = fetch + merge）  \\
+        git branch  &  展示所有分支列表（*为当前所在分支）  \\
+        git branch name  &  创建分支"name"  \\
+        git checkout name  &  切换到"name"分支  \\
+        git merge main -m "description"  &  将"main"与当前"name"合并并附带说明 \\
+        git status  &  查看项目变动状态  \\
+        git diff name1 name2  &  查看当前name1与name2差异  \\
+        git stash  &  将未完成的工作暂存到一边  \\
+        git stash pop  &  pop恢复最近一次暂存的工作(同时将它从暂存列表删除)  \\
+        git stash apply  &  恢复最近一次暂存的工作（它们还会安全地保存在暂存区里供后续使用）  \\
+        git stash list  &  查看所有暂存修改地列表  \\
+        git stash pop stash@{0}  &  通过标识符来应用或取出特定的暂存内容  \\
+        git stash apply stash@{0}  &  通过标识符来应用或取出特定的暂存内容  \\
+        git reset  &  清除暂存区/恢复之前的状态(类似回撤)  \\
+        git reset HEAD~  &  回退到之前的状态  \\        
+        git revert  &  撤销之前某次提交引入的变更(不会删除旧的提交，而是生成一个新的分支进行改动)  \\
+        git config --global user.email "you@email.com"  &  首次登陆用户邮箱配置  \\
+        git config --global user.name "Your Name"  &  首次登陆用户名称配置  \\
+        \bottomrule
+    \end{tabular}
+    }
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{figs/1.png}
+    \caption{reset \& revert}
+\end{figure}
+
+\href{https://www.bilibili.com/video/BV1JBj664EHE/?spm_id_from=333.1391.0.0&vd_source=55750bb2b23fc9f9d7506e948d828cdd}{2026版Git与GitHub初学者课程}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
